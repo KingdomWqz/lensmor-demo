@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feature Completeness Audit Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_url",
+    "evaluated_at",
+    "tooling",
+    "total_score",
+    "p0_p1_passed",
+    "verdict",
+    "requirements",
+    "success_criteria",
+    "evidence",
+    "scope_notes"
+  ],
+  "properties": {
+    "target_url": {
+      "type": "string"
+    },
+    "evaluated_at": {
+      "type": "string"
+    },
+    "tooling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opencli",
+        "chrome_devtools"
+      ],
+      "properties": {
+        "opencli": {
+          "type": "string"
+        },
+        "chrome_devtools": {
+          "type": "string"
+        }
+      }
+    },
+    "total_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5
+    },
+    "p0_p1_passed": {
+      "type": "boolean"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "partial",
+        "fail"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "priority",
+          "score",
+          "status",
+          "summary",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "P0",
+              "P1"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "implemented",
+              "partial",
+              "claimed",
+              "missing",
+              "blocked"
+            ]
+          },
+          "summary": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "success_criteria": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "summary"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "met",
+              "partial",
+              "unmet",
+              "blocked"
+            ]
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "url",
+          "summary"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "page",
+              "interaction",
+              "network",
+              "console",
+              "screenshot"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "scope_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
