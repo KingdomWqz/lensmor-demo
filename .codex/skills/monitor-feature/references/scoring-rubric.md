@@ -1,10 +1,12 @@
 # Scoring Rubric
 
 Score five dimensions from `0.0` to `1.0`. Total score is the sum, capped at `5.0`.
+Intermediate scores are allowed when the evidence does not cleanly fit the anchor examples below.
 
 ## Dimension 1: Quick Setup (`UR-1`)
 
-- `1.0`: Clear flow to define monitoring targets and start monitoring
+- `1.0`: Clear flow to define monitoring targets, start monitoring, and stop/pause monitoring without destructive deletion
+- `0.8`: Creation and start flow work, but stop/pause is missing or only achievable by deleting the target, which creates a likely risk that historical intelligence will no longer be accessible
 - `0.75`: Strong setup surface, but one critical step is unclear or only partially evidenced
 - `0.5`: Some setup/configuration UI exists, but it is incomplete or weakly evidenced
 - `0.25`: Only marketing or static claims about easy setup

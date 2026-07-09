@@ -4,7 +4,7 @@
 
 - 目标 URL: `https://myapp-uyxu.vercel.app/dashboard`
 - 评测时间: `2026-07-09T13:50:29Z`
-- 总分: `4.50 / 5.0`
+- 总分: `4.30 / 5.0`
 - P0/P1 是否通过: `true`
 - 结论: `pass`
 
@@ -12,7 +12,7 @@
 
 | 需求 | 优先级 | 分数 | 状态 | 证据摘要 |
 | --- | --- | --- | --- | --- |
-| UR-1 快速配置 | P0 | 1.00 | implemented | 在登录态下，审计通过真实产品 UI 创建了 `picpi`，观察到 `POST /api/competitors` 返回 `201`，随后竞对列表持久化显示 `picpi` 和 `Audit Example`。 |
+| UR-1 快速配置 | P0 | 0.80 | partial | 在登录态下，审计通过真实产品 UI 创建了 `picpi`，观察到 `POST /api/competitors` 返回 `201`，随后竞对列表持久化显示 `picpi` 和 `Audit Example`；但未发现非破坏性的停止监控入口，如需停用很可能只能删除竞对。 |
 | UR-3 持续采集与解读 | P0 | 0.75 | partial | 创建 `picpi` 并触发上游 demo timer 后，`/dashboard/snapshots/8` 确实出现了 1 条真实记录，`/api/snapshots?competitor_id=8&limit=20` 也返回非空数组；但产品没有暴露监控间隔配置，且在 `picpi` 每 10 秒变化的情况下，本次只观察到 1 条变化内容，持续采集强度证据不足。 |
 | UR-4 结构化情报消费 | P0 | 1.00 | implemented | Dashboard 收集箱具备归档状态标签、竞对筛选、重要度筛选、可选择列表和详情跳转，历史页与详情页也都可用。 |
 | UR-5 可执行建议 | P0 | 1.00 | implemented | 快照详情 `552` 的 AI 解读区包含完整的 `变化 -> 意图 -> 行动 -> 理由` 链路。 |
@@ -29,7 +29,7 @@
 - `https://myapp-uyxu.vercel.app/dashboard`
   匿名态下通过 DevTools 打开会重定向到 `/login`，且受保护 API 返回 `401`，说明匿名用户无法验证核心监控流程。
 - `https://myapp-uyxu.vercel.app/dashboard/competitors`
-  登录态下存在真实的竞对管理界面。审计在这里创建了 `picpi`，之后确认 `picpi` 和 `Audit Example` 都被持久化保存。
+  登录态下存在真实的竞对管理界面。审计在这里创建了 `picpi`，之后确认 `picpi` 和 `Audit Example` 都被持久化保存；同时未发现非破坏性的停止监控入口，如需停用很可能只能删除竞对。
 - `https://myapp-uyxu.vercel.app/api/competitors`
   创建过程中，产品发起了 `POST /api/competitors` 并返回 `201`，随后 `GET /api/competitors` 返回 `array(2)`。
 - `https://picpi-iota.vercel.app/api/timer/start`
@@ -56,6 +56,7 @@
 - 在 dashboard、历史页、详情页和设置页中，都没有发现点赞/点踩、质量纠错、反馈表单等产品内反馈入口。
 - 通知能力目前只有配置层证据，本次审计没有验证真实邮件投递或投递日志。
 - 尽管 `picpi` 上游 demo 已按 10 秒频率持续变化，但本次产品侧仅观察到 1 条变化记录，无法强证明监控循环已稳定覆盖该变化频率。
+- 产品未发现非破坏性的停止监控能力；如需停用很可能只能删除竞对，目标生命周期管理不完整，且历史监控内容可能因此失去查看入口。
 - 产品没有向用户暴露监控间隔时间设置，因此无法验证用户是否能控制采集周期。
 
 ## 范围说明
@@ -75,16 +76,16 @@
     "opencli": "用于登录态浏览、交互和网络取证。",
     "chrome_devtools": "用于验证匿名态重定向和受保护 API 行为。"
   },
-  "total_score": 4.5,
+  "total_score": 4.3,
   "p0_p1_passed": true,
   "verdict": "pass",
   "requirements": [
     {
       "id": "UR-1 Quick setup",
       "priority": "P0",
-      "score": 1,
-      "status": "implemented",
-      "summary": "审计通过真实 UI 创建了 picpi，观察到 POST /api/competitors 返回 201，并确认该竞对已持久化保存。",
+      "score": 0.8,
+      "status": "partial",
+      "summary": "审计通过真实 UI 创建了 picpi，观察到 POST /api/competitors 返回 201，并确认该竞对已持久化保存；但未发现非破坏性的停止监控入口，如需停用很可能只能删除竞对。",
       "evidence_refs": ["e2", "e3"]
     },
     {
@@ -148,7 +149,7 @@
       "id": "e2",
       "type": "interaction",
       "url": "https://myapp-uyxu.vercel.app/dashboard/competitors",
-      "summary": "审计通过产品内竞对表单创建了 picpi，随后在列表中确认它已持久化。"
+      "summary": "审计通过产品内竞对表单创建了 picpi，随后在列表中确认它已持久化；同时未发现非破坏性的停止监控入口，如需停用很可能只能删除竞对。"
     },
     {
       "id": "e3",

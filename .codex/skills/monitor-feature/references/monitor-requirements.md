@@ -8,6 +8,7 @@ This file freezes the baseline for the feature-completeness audit. Do not fetch 
 
 - `UR-1 Quick setup`
   - The user can register their own product and target competitors, then start monitoring quickly.
+  - The target lifecycle should support a non-destructive stop/pause path. Users should not be forced to delete a target just to stop monitoring, especially when that may remove access to historical intelligence.
 - `UR-3 Continuous, automated collection and interpretation`
   - The system periodically collects competitor signals, identifies meaningful changes, and interprets them without manual intervention.
 - `UR-4 Structured intelligence consumption`
