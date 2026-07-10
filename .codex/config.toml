@@ -1,5 +1,5 @@
 [mcp_servers.chrome-devtools]
 type = "stdio"
-command = "/Users/derek/.npm-global/bin/chrome-devtools-mcp"
+command = "C:\\Users\\EDY\\AppData\\Roaming\\npm\\chrome-devtools-mcp.cmd"
 args = ["--headless", "--isolated", "--channel", "stable", "--no-usage-statistics"]
-cwd = "/Volumes/derek-data/github/lensmor-demo"
+cwd = "D:\\github\\lensmor-demo"

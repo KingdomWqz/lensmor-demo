@@ -3,6 +3,12 @@
 Score five dimensions from `0.0` to `1.0`. Total score is the sum, capped at `5.0`.
 Intermediate scores are allowed when the evidence does not cleanly fit the anchor examples below.
 
+## Bug-Aware Scoring Rule
+
+- If a requirement is clearly implemented on primary product surfaces or verified APIs, but a secondary page, log view, or supporting surface has a real bug, do not automatically downgrade the requirement to `partial` or `missing`.
+- In this case, prefer keeping the status as `implemented` and apply a modest score deduction, typically around `0.05` to `0.2`, depending on how much the bug reduces completeness, trust, or observability.
+- Only downgrade to `partial` when the bug breaks the core requirement itself, prevents meaningful use, or leaves the key outcome unverified.
+
 ## Dimension 1: Quick Setup (`UR-1`)
 
 - `1.0`: Clear flow to define monitoring targets, start monitoring, and stop/pause monitoring without destructive deletion
