@@ -1,0 +1,207 @@
+# Feature Completeness Audit
+
+## Summary
+
+- Target URL: `https://nova-web-tawny.vercel.app`
+- Evaluated At: `2026-07-10T08:24:49.9014375+08:00`
+- Total Score: `2.85 / 5.0`
+- P0/P1 Passed: `false`
+- Verdict: `partial`
+
+## Requirement Matrix
+
+| Requirement | Priority | Score | Status | Evidence Summary |
+| --- | --- | --- | --- | --- |
+| UR-1 Quick setup | P0 | 0.40 | partial | 已验证后端存在 `intel_competitor` / `intel_monitor_target` 等对象，且历史会话会建议补录竞品、配置监控目标并触发采集；但未发现可验证的自助配置 UI，也未发现非破坏性的暂停/停止监控入口。 |
+| UR-3 Continuous collection and interpretation | P0 | 0.90 | implemented | 运营与老板视角会话由内置工具 `build_competitive_insight_brief` 生成，能给出变化摘要、证据引用、业务影响、建议动作，以及 33 个竞品、44 个目标、140 次运行、0 次失败、最新数据时间等指标。 |
+| UR-4 Structured intelligence consumption | P0 | 0.60 | partial | `/intelligence` 提供搜索、最近对话列表、详情面板、重命名/删除与新对话；但这是“会话列表”，不是完整的“情报收件箱”，未验证到归档、已读/未读管理、筛选器面板等。 |
+| UR-5 Actionable recommendations | P0 | 0.95 | implemented | 老板视角会话给出具体竞品动作、业务影响、建议动作和证据来源；零数据场景也会给出补录竞品、配置目标和全量采集的具体动作。 |
+| UR-6 Proactive notification + feedback | P1 | 0.00 | missing | 未验证到 email、Slack、Webhook、应用内推送、投递历史或点赞/点踩/纠错等反馈机制。数据源会话虽列出 `feedback` / `quality_signal` 表，但没有对应产品面。 |
+
+## Success Criteria Check
+
+- Recurring intelligence without manual operation: `partial`。连续采集与报告生成已被 140 次运行、44 个监控目标和最新数据时间所证明，但当前主要消费形态仍是手动进入会话查看，未验证到自动投递。
+- `change -> intent -> recommendation` chain: `met`。老板视角会话同时给出竞品变化、业务影响解读和建议动作，并附证据引用与来源 URL。
+- Feedback mechanism for quality improvement: `unmet`。没有验证到用户可操作的情报质量反馈入口。
+
+## Key Evidence
+
+- `E1` `https://nova-web-tawny.vercel.app/chat`：Chrome DevTools 匿名页快照显示聊天壳页上覆盖“登录后免费使用完整功能 / 账号密码登录”弹层，核心流程需登录。
+- `E2` `https://nova-web-tawny.vercel.app/chat`：OpenCLI 网络抓到 `POST /prod-api/auth/login` 返回 `200`，随后 `GET /prod-api/system/session/list` 返回 `25` 行会话数据。
+- `E3` `https://nova-web-tawny.vercel.app/intelligence`：登录态页面展示搜索框、最近对话列表、详情面板、新对话按钮，以及会话级“重命名 / 删除”菜单。
+- `E4` `https://nova-web-tawny.vercel.app/intelligence`：会话“竞品情报验证-数据源”列出 `intel_competitor`、`intel_monitor_target`、`intel_task_run`、`intel_raw_capture`、`intel_snapshot`、`intel_change`、`intel_report`、`intel_feedback`、`intel_quality_signal` 共 9 类数据源，并声明只读限制。
+- `E5` `https://nova-web-tawny.vercel.app/intelligence`：会话“现在我们有什么竞品”明确建议“补录 3-5 个竞品”“配置监控目标”“执行一次全量采集”“校验 raw_capture → snapshot → change 链路”。
+- `E6` `https://nova-web-tawny.vercel.app/intelligence`：会话“竞品情报验证-老板视角”返回 `3` 条 `evidenceRefs`，引用 `https://bandy.ai/pricing`、`https://www.sellerpic.ai/`、`https://bandy.ai`，并给出业务影响和建议动作。
+- `E7` `https://nova-web-tawny.vercel.app/intelligence`：会话“1. 从运营视角看，”返回 `竞品 33 个 / 监控目标 44 个 / 报告 20 条 / 未读 9 条 / 质量信号 7 条 / 采集运行 140 次 / 失败 0 次 / 最新数据时间 2026-07-08T11:06:04`。
+- `E8` `https://nova-web-tawny.vercel.app/intelligence`：页面关键字与控件扫描未发现 `email`、`Slack`、`Webhook`、`反馈`、`点赞/点踩`、`设置` 等通知或质量反馈入口。
+- `E9` `https://nova-web-tawny.vercel.app/chat`：`localStorage.user` 已含 JWT，Pinia 中 `isLoginDialogVisible=false`，但登录弹层仍持续渲染，说明前端状态同步有缺陷。
+
+## Gaps
+
+- 没有验证到用户从 UI 新增竞品、录入自家产品、配置监控目标、启动监控、暂停监控或停止监控的完整闭环。
+- 没有验证到“结构化情报收件箱”级别的筛选、归档、已读/未读切换、状态管理或报告列表界面；当前更像围绕 AI 会话消费情报。
+- 没有验证到通知渠道或投递历史，因此无法证明“无需手动进入系统也能收到重要情报”。
+- 没有验证到反馈回写能力；`feedback` / `quality_signal` 仅出现在数据源说明中。
+- 产品内历史会话存在明显口径冲突：一条会话称租户下无竞品实体与监控记录，另一条会话又给出 `33` 个竞品、`44` 个目标、`140` 次运行和多条报告。该矛盾削弱了情报可信度。
+- 登录成功后弹层不消失，且部分点击桥接失效；这会直接影响可用性和审计可验证性。
+
+## Scope Notes
+
+- 匿名态证据来自 Chrome DevTools 页面；登录态证据来自用户登录后的 OpenCLI 浏览器上下文。这两个浏览器上下文不共享登录态。
+- 审计过程中为绕过残留登录弹层与点击桥接故障，使用了本地路由/Pinia 状态读取和会话加载动作；未执行任何破坏性服务器端变更。
+- “可补录竞品/配置监控目标”的结论来自产品内历史会话与数据源枚举，不应视为已验证的自助配置 UI。
+- 未执行删除监控目标、暂停监控、通知投递、反馈写回等潜在破坏性或高风险操作。
+
+## JSON Result
+
+```json
+{
+  "target_url": "https://nova-web-tawny.vercel.app",
+  "evaluated_at": "2026-07-10T08:24:49.9014375+08:00",
+  "tooling": {
+    "opencli": "used: browser state, extract, network, console, eval",
+    "chrome_devtools": "used: new_page, take_snapshot, list_network_requests, list_console_messages"
+  },
+  "total_score": 2.85,
+  "p0_p1_passed": false,
+  "verdict": "partial",
+  "requirements": [
+    {
+      "id": "UR-1 Quick setup",
+      "priority": "P0",
+      "score": 0.4,
+      "status": "partial",
+      "summary": "验证到后端数据模型包含 competitor、monitor_target、task_run 等对象，且历史会话会建议补录竞品、配置监控目标并触发全量采集；但未发现可验证的自助配置 UI，也未发现非破坏性的暂停/停止监控入口。当前可见的会话管理仅有重命名和删除。",
+      "evidence_refs": [
+        "E3",
+        "E4",
+        "E5"
+      ]
+    },
+    {
+      "id": "UR-3 Continuous collection and interpretation",
+      "priority": "P0",
+      "score": 0.9,
+      "status": "implemented",
+      "summary": "历史会话由内置工具 build_competitive_insight_brief 生成，能输出竞品变化摘要、关键证据、业务影响与建议动作；运营视角会话还显示 33 个竞品、44 个监控目标、20 条报告、9 条未读、140 次采集运行、0 次失败，以及最新数据时间。",
+      "evidence_refs": [
+        "E6",
+        "E7"
+      ]
+    },
+    {
+      "id": "UR-4 Structured intelligence consumption",
+      "priority": "P0",
+      "score": 0.6,
+      "status": "partial",
+      "summary": "/intelligence 提供搜索框、最近对话列表、详情面板、会话重命名/删除和新对话入口，属于结构化浏览界面；但它是“会话收件箱”而不是“情报收件箱”，没有验证到按未读/归档/类型等维度管理情报条目的产品面。",
+      "evidence_refs": [
+        "E3",
+        "E8"
+      ]
+    },
+    {
+      "id": "UR-5 Actionable recommendations",
+      "priority": "P0",
+      "score": 0.95,
+      "status": "implemented",
+      "summary": "老板视角会话给出具体竞品动作、业务影响、建议动作和证据来源；无数据场景下也会给出补录竞品、配置监控目标和执行全量采集的明确操作建议。",
+      "evidence_refs": [
+        "E5",
+        "E6"
+      ]
+    },
+    {
+      "id": "UR-6 Proactive notification + feedback",
+      "priority": "P1",
+      "score": 0.0,
+      "status": "missing",
+      "summary": "未在 /chat 或 /intelligence 上验证到 email、Slack、webhook、应用内推送、投递历史或情报质量反馈控件。虽然数据源会话列出了 feedback 和 quality_signal 表，但没有可验证的通知或反馈产品面。",
+      "evidence_refs": [
+        "E4",
+        "E8"
+      ]
+    }
+  ],
+  "success_criteria": [
+    {
+      "id": "SC-1 recurring_intelligence_without_manual_operation",
+      "status": "partial",
+      "summary": "连续采集与报告生成已被 140 次运行、44 个监控目标和最新数据时间所证明，但当前主要消费形态仍是手动进入会话查看，未验证到自动投递。"
+    },
+    {
+      "id": "SC-2 change_intent_recommendation_chain",
+      "status": "met",
+      "summary": "老板视角会话同时给出竞品变化、业务影响/意图解读和建议动作，并附带证据引用与来源 URL。"
+    },
+    {
+      "id": "SC-3 feedback_mechanism",
+      "status": "unmet",
+      "summary": "没有验证到用户可操作的点赞/点踩、报告纠错、质量反馈表单或等价机制。"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "type": "page",
+      "url": "https://nova-web-tawny.vercel.app/chat",
+      "summary": "Chrome DevTools 匿名页快照显示聊天壳页之上覆盖“登录后免费使用完整功能 / 账号密码登录”弹层，说明核心流程需要登录。"
+    },
+    {
+      "id": "E2",
+      "type": "network",
+      "url": "https://nova-web-tawny.vercel.app/chat",
+      "summary": "OpenCLI 网络抓到 POST /prod-api/auth/login 返回 200，随后 GET /prod-api/system/session/list 返回 25 行会话数据，说明登录后端链路与历史会话加载可用。"
+    },
+    {
+      "id": "E3",
+      "type": "page",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "登录态 /intelligence 页面展示搜索框、最近对话列表、详情面板、新对话按钮，以及某条会话上的“重命名 / 删除”菜单。"
+    },
+    {
+      "id": "E4",
+      "type": "interaction",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "数据源会话“竞品情报验证-数据源”展示 9 类后端数据源：intel_competitor、intel_monitor_target、intel_task_run、intel_raw_capture、intel_snapshot、intel_change、intel_report、intel_feedback、intel_quality_signal，并注明只读、maxRows=50、长文本 500 字限制。"
+    },
+    {
+      "id": "E5",
+      "type": "interaction",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "会话“现在我们有什么竞品”返回：当前租户暂无竞品实体或监控记录，并建议补录 3-5 个竞品、配置监控目标、执行全量采集和校验 raw_capture → snapshot → change 链路。"
+    },
+    {
+      "id": "E6",
+      "type": "interaction",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "会话“竞品情报验证-老板视角”由 build_competitive_insight_brief 生成，返回 3 条 evidenceRefs，引用 bandy.ai/pricing、sellerpic.ai、bandy.ai，并给出业务影响与建议动作。"
+    },
+    {
+      "id": "E7",
+      "type": "interaction",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "会话“1. 从运营视角看，”返回关键指标：竞品 33 个、监控目标 44 个、报告 20 条、未读 9 条、质量信号 7 条、采集运行 140 次、失败 0 次、最新数据时间 2026-07-08T11:06:04。"
+    },
+    {
+      "id": "E8",
+      "type": "page",
+      "url": "https://nova-web-tawny.vercel.app/intelligence",
+      "summary": "页面关键字扫描与可见控件扫描未发现 email、Slack、Webhook、反馈、点赞/点踩、设置等通知或质量反馈入口；可见控件仅包括搜索、竞品情报入口、新对话、登录弹层和会话菜单。"
+    },
+    {
+      "id": "E9",
+      "type": "console",
+      "url": "https://nova-web-tawny.vercel.app/chat",
+      "summary": "登录态本地状态不一致：localStorage.user 含 JWT 且 Pinia user.isLoginDialogVisible=false，但 /chat 与 /intelligence 仍持续渲染登录弹层，属于前端状态同步问题。"
+    }
+  ],
+  "scope_notes": [
+    "匿名态证据来自 Chrome DevTools 页面；登录态证据来自用户登录后的 OpenCLI 浏览器上下文。这两个浏览器上下文不共享登录态。",
+    "为绕过残留登录弹层与点击桥接故障，本次审计使用了本地路由/Pinia 状态读取和会话加载动作；未执行任何破坏性服务器端变更。",
+    "报告中的“可补录竞品/配置监控目标”结论来自产品内历史会话与数据源枚举，不等于已验证了完整自助配置 UI。",
+    "未验证删除监控目标、暂停监控、通知投递、反馈写回等高风险或潜在破坏性操作。",
+    "产品内不同会话存在数据口径不一致：部分会话显示当前租户无竞品实体，另一些会话又显示 33 个竞品、44 个监控目标和 140 次运行；报告按已观察到的矛盾现象原样记录，并视为可信度风险。"
+  ]
+}
+```
