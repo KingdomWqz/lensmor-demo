@@ -1,5 +1,5 @@
 [mcp_servers.chrome-devtools]
 type = "stdio"
-command = "/Users/derek/.npm-global/bin/chrome-devtools-mcp"
-args = ["--headless", "--isolated", "--channel", "stable", "--no-usage-statistics"]
-cwd = "/Volumes/derek-data/github/lensmor-demo"
+command = "npx"
+args = ["-y", "chrome-devtools-mcp", "--headless", "--isolated", "--channel", "stable", "--no-usage-statistics"]
+cwd = "."
